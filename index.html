@@ -1107,55 +1107,6 @@
       background: var(--warm);
     }
 
-    /* ===== 昼夜过渡：CSS 滚动驱动（合成器线程，滚动丝滑）===== */
-    @supports (animation-timeline: view()) {
-      .day-night-stage {
-        animation-timeline: view();
-        animation-range: entry 0% exit 100%;
-      }
-      .day-image {
-        animation: wcDayFade linear both;
-        animation-timeline: view();
-        animation-range: entry 55% exit 95%;
-      }
-      .night-image {
-        animation: wcNightFade linear both;
-        animation-timeline: view();
-        animation-range: entry 55% exit 95%;
-      }
-      .day-night-shade {
-        animation: wcNightFade linear both;
-        animation-timeline: view();
-        animation-range: entry 55% exit 95%;
-      }
-      .day-copy {
-        animation: wcDayCopyOut linear both;
-        animation-timeline: view();
-        animation-range: entry 62% exit 74%;
-      }
-      .night-copy {
-        animation: wcNightCopyIn linear both;
-        animation-timeline: view();
-        animation-range: entry 78% exit 90%;
-      }
-      @keyframes wcDayFade {
-        from { opacity: 1; }
-        to   { opacity: 0; }
-      }
-      @keyframes wcNightFade {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-      }
-      @keyframes wcDayCopyOut {
-        from { opacity: 1; transform: translateY(0); }
-        to   { opacity: 0; transform: translateY(-20px); }
-      }
-      @keyframes wcNightCopyIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-    }
-
     /* ==================== 老年人：暖色场 ==================== */
 
     .old-section {
@@ -2189,16 +2140,6 @@
         scroll-behavior: auto !important;
         transition-duration: .01ms !important;
       }
-      @supports (animation-timeline: view()) {
-        .day-image,
-        .night-image,
-        .day-copy,
-        .night-copy,
-        .day-night-shade {
-          animation-duration: 1s !important;
-          animation-iteration-count: 1 !important;
-        }
-      }
     }
 
     @keyframes title-in {
@@ -3171,9 +3112,6 @@
       return t * t * (3 - 2 * t);
     }
 
-    const supportsScrollTimeline =
-      typeof CSS !== "undefined" && CSS.supports && CSS.supports("animation-timeline: view()");
-
     function updateDayNight() {
       const rect = dayNightStage.getBoundingClientRect();
       const vh = window.innerHeight;
@@ -3191,21 +3129,19 @@
 
       dayNightHud.classList.toggle("visible", deskGone && stageInView);
 
-      if (!supportsScrollTimeline) {
-        const img = smoothstep(0.12, 0.88, p);
-        dayImage.style.opacity = String(1 - img);
-        nightImage.style.opacity = String(img);
+      const img = smoothstep(0.12, 0.88, p);
+      dayImage.style.opacity = String(1 - img);
+      nightImage.style.opacity = String(img);
 
-        const dayOut = smoothstep(0.24, 0.46, p);
-        const nightIn = smoothstep(0.54, 0.78, p);
+      const dayOut = smoothstep(0.24, 0.46, p);
+      const nightIn = smoothstep(0.54, 0.78, p);
 
-        dayCopy.style.opacity = String(1 - dayOut);
-        nightCopy.style.opacity = String(nightIn);
-        dayCopy.style.transform = `translateY(${dayOut * -20}px)`;
-        nightCopy.style.transform = `translateY(${(1 - nightIn) * 20}px)`;
+      dayCopy.style.opacity = String(1 - dayOut);
+      nightCopy.style.opacity = String(nightIn);
+      dayCopy.style.transform = `translateY(${dayOut * -20}px)`;
+      nightCopy.style.transform = `translateY(${(1 - nightIn) * 20}px)`;
 
-        dayNightShade.style.opacity = String(img);
-      }
+      dayNightShade.style.opacity = String(img);
 
       const minutes = Math.round(8 * 60 + (22 * 60 - 8 * 60) * p);
       const hours = String(Math.floor(minutes / 60)).padStart(2, "0");
